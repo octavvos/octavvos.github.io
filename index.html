@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Light · octavvos</title>
+<meta name="description" content="Light (octavvos) — Farg'onalik backend dasturchi: Python, Django, DRF, Telegram botlar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Onest:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one left-aligned column (max 1080px); hero = name + real git log, then featured pair, project ledger, stack table, contact. */
+:root {
+  --bg: #f3f6f6;
+  --surface: #ffffff;
+  --ink: #0f1e23;
+  --muted: #53666b;
+  --line: #d4dedf;
+  --accent: #0a6c76;      /* Rishton ishkor glaze */
+  --accent-soft: #dcecee;
+  --on-accent: #ffffff;
+  --atlas-1: #b8185a;     /* Margilan atlas: magenta, gold, cobalt */
+  --atlas-2: #d99a12;
+  --atlas-3: #1d4fa6;
+  --term-bg: #0f1e23;
+  --term-ink: #d7e4e5;
+  --term-dim: #7f9599;
+  --term-hash: #e0b04a;
+
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.1875rem;
+  --step-2: 1.5rem;
+  --step-3: clamp(1.75rem, 1.3rem + 1.8vw, 2.5rem);
+  --step-hero: clamp(4rem, 2rem + 10vw, 9.5rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1417;
+    --surface: #111f23;
+    --ink: #e3ebeb;
+    --muted: #8ea2a6;
+    --line: #22363b;
+    --accent: #5cc6cd;
+    --accent-soft: #143238;
+    --on-accent: #062226;
+    --atlas-1: #e04a85;
+    --atlas-2: #f0b93a;
+    --atlas-3: #5b86e0;
+    --term-bg: #070e10;
+    --term-ink: #d7e4e5;
+    --term-dim: #6f8589;
+    --term-hash: #f0c060;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b1417;
+  --surface: #111f23;
+  --ink: #e3ebeb;
+  --muted: #8ea2a6;
+  --line: #22363b;
+  --accent: #5cc6cd;
+  --accent-soft: #143238;
+  --on-accent: #062226;
+  --atlas-1: #e04a85;
+  --atlas-2: #f0b93a;
+  --atlas-3: #5b86e0;
+  --term-bg: #070e10;
+  --term-ink: #d7e4e5;
+  --term-dim: #6f8589;
+  --term-hash: #f0c060;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (min-width: 720px) {
+  .wrap { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); }
+}
+
+/* Header */
+.top { padding-block: 20px; }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.handle { font-family: var(--mono); font-size: var(--step--1); text-decoration: none; color: var(--muted); }
+.handle b { color: var(--ink); font-weight: 500; }
+.nav { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.nav a { font-size: var(--step--1); text-decoration: none; color: var(--muted); }
+.nav a:hover { color: var(--ink); }
+.lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; }
+.lang button {
+  font: 500 0.75rem/1 var(--mono); letter-spacing: 0.06em;
+  border: 0; background: transparent; color: var(--muted);
+  padding: 6px 10px; border-radius: 999px; cursor: pointer;
+}
+.lang button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+/* Hero */
+.hero { padding-block: 40px 56px; }
+.hero .wrap { display: grid; gap: 40px; }
+@media (min-width: 900px) { .hero .wrap { grid-template-columns: 1fr 1.05fr; align-items: end; gap: 56px; } }
+.eyebrow {
+  font-family: var(--mono); font-size: var(--step--1); color: var(--accent);
+  letter-spacing: 0.04em; margin: 0 0 12px;
+}
+.name {
+  font-family: var(--display);
+  font-variation-settings: "wdth" 125;
+  font-weight: 800;
+  font-size: var(--step-hero);
+  line-height: 0.86;
+  letter-spacing: -0.035em;
+  margin: 0 0 24px;
+}
+.lede { font-size: var(--step-1); line-height: 1.5; margin: 0 0 12px; max-width: 34ch; text-wrap: pretty; }
+.sub { color: var(--muted); margin: 0 0 28px; max-width: 46ch; text-wrap: pretty; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-weight: 500; font-size: 0.9375rem; text-decoration: none;
+  padding: 11px 18px; border-radius: 8px; border: 1px solid var(--line);
+  transition: transform .15s ease, background-color .15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.ghost { background: var(--surface); }
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } .btn:hover { transform: none; } }
+
+.stats { display: flex; gap: 32px; flex-wrap: wrap; margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--line); }
+.stat { display: grid; gap: 2px; }
+.stat strong { font-family: var(--display); font-variation-settings: "wdth" 110; font-size: var(--step-2); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.stat span { font-size: var(--step--1); color: var(--muted); }
+
+/* Terminal */
+.term { background: var(--term-bg); color: var(--term-ink); border-radius: 12px; overflow: hidden; min-width: 0; }
+.term-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.term-bar .dots { display: flex; gap: 6px; }
+.term-bar .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--term-dim); opacity: .5; }
+.term-bar small { font: 400 0.75rem var(--mono); color: var(--term-dim); }
+.term pre { margin: 0; padding: 16px; overflow-x: auto; font: 400 0.8125rem/1.75 var(--mono); }
+.term .cmd { color: var(--term-ink); }
+.term .cmd::before { content: "$ "; color: var(--term-dim); }
+.term .h { color: var(--term-hash); }
+.term .d { color: var(--term-dim); }
+.term .r { color: var(--accent); }
+.term-caption { font-size: var(--step--1); color: var(--muted); margin: 10px 0 0; }
+
+/* Atlas band: the one decorative element */
+.atlas {
+  height: 14px;
+  background:
+    repeating-linear-gradient(90deg,
+      var(--atlas-1) 0 22px, var(--atlas-2) 22px 30px, var(--atlas-3) 30px 52px,
+      var(--accent) 52px 60px, var(--atlas-2) 60px 66px, var(--atlas-1) 66px 80px);
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 5px, rgba(0,0,0,.72) 5px 7px, #000 7px 11px, rgba(0,0,0,.5) 11px 12px);
+          mask: repeating-linear-gradient(90deg, #000 0 5px, rgba(0,0,0,.72) 5px 7px, #000 7px 11px, rgba(0,0,0,.5) 11px 12px);
+}
+
+/* Sections */
+section { padding-block: 72px; }
+section + section { border-top: 1px solid var(--line); }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+h2 {
+  font-family: var(--display); font-variation-settings: "wdth" 112;
+  font-size: var(--step-3); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1;
+  margin: 0; text-wrap: balance;
+}
+.sec-note { color: var(--muted); font-size: var(--step--1); margin: 0; }
+
+/* Featured */
+.featured { display: grid; gap: 20px; }
+@media (min-width: 860px) { .featured { grid-template-columns: 1fr 1fr; } }
+.feat {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 28px; display: flex; flex-direction: column; gap: 16px; min-width: 0;
+}
+.feat-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.feat h3 {
+  font-family: var(--display); font-variation-settings: "wdth" 120;
+  font-size: var(--step-2); font-weight: 700; letter-spacing: -0.015em; margin: 0;
+}
+.pill {
+  font: 500 0.6875rem/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 6px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent);
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+.pill.live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.feat p { margin: 0; text-wrap: pretty; }
+.feat ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--muted); font-size: 0.9375rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 4px; }
+.chip { font: 400 0.75rem/1 var(--mono); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); color: var(--muted); }
+.links { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.9375rem; font-weight: 500; }
+.links a { color: var(--accent); text-decoration: none; }
+.links a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.meta { font: 400 var(--step--1) var(--mono); color: var(--muted); }
+
+/* Ledger of other projects */
+.ledger { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.row {
+  display: grid; gap: 6px 24px; padding-block: 20px; border-bottom: 1px solid var(--line);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) {
+  .row { grid-template-columns: 11rem minmax(0, 1fr) 13rem; align-items: baseline; }
+}
+.row a.title {
+  font-family: var(--display); font-variation-settings: "wdth" 112; font-weight: 700;
+  font-size: var(--step-1); text-decoration: none; letter-spacing: -0.01em;
+}
+.row a.title:hover { color: var(--accent); }
+.row p { margin: 0; color: var(--ink); min-width: 0; text-wrap: pretty; }
+.row .stack { font: 400 var(--step--1)/1.5 var(--mono); color: var(--muted); }
+@media (min-width: 760px) { .row .stack { text-align: right; } }
+
+/* Stack table */
+.stack-table { display: grid; border-top: 1px solid var(--line); }
+.stack-row { display: grid; gap: 4px 24px; padding-block: 14px; border-bottom: 1px solid var(--line); }
+@media (min-width: 640px) { .stack-row { grid-template-columns: 11rem 1fr; } }
+.stack-row dt { font: 500 var(--step--1) var(--mono); color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; padding-top: 2px; }
+.stack-row dd { margin: 0; }
+dl { margin: 0; }
+
+/* Contact */
+.contact { display: grid; gap: 28px; }
+@media (min-width: 860px) { .contact { grid-template-columns: 1.2fr 1fr; align-items: end; } }
+.contact .big {
+  font-family: var(--display); font-variation-settings: "wdth" 118; font-weight: 700;
+  font-size: var(--step-3); line-height: 1.12; letter-spacing: -0.02em; margin: 0; text-wrap: balance; max-width: 18ch;
+}
+.contact-list { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--line); }
+.contact-list li { display: flex; justify-content: space-between; gap: 16px; padding-block: 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.contact-list span { color: var(--muted); font-size: var(--step--1); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.04em; }
+.contact-list a { color: var(--accent); text-decoration: none; font-weight: 500; overflow-wrap: anywhere; }
+.contact-list a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+footer { padding-block: 28px 40px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: var(--step--1); color: var(--muted); }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="handle" href="https://github.com/octavvos" target="_blank" rel="noopener">github.com/<b>octavvos</b></a>
+    <nav class="nav" aria-label="Sahifa">
+      <a href="#loyihalar" data-i18n="nav_projects">Loyihalar</a>
+      <a href="#stek" data-i18n="nav_stack">Stek</a>
+      <a href="#aloqa" data-i18n="nav_contact">Aloqa</a>
+      <div class="lang" role="group" aria-label="Til / Language">
+        <button type="button" id="lang-uz" data-lang="uz" aria-pressed="true">UZ</button>
+        <button type="button" id="lang-en" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow" data-i18n="eyebrow">Backend dasturchi · Farg'ona, O'zbekiston</p>
+        <h1 class="name">Light</h1>
+        <p class="lede" data-i18n="lede">Bizneslar har kuni ishlatadigan backend yozaman: CRM, ta'lim platformalari, Telegram botlar.</p>
+        <p class="sub" data-i18n="sub">Python va Django'da ishlayman. Tizim ichida nima bo'layotganini tushunishni yaxshi ko'raman, shuning uchun Git'ni noldan yozib chiqdim.</p>
+        <div class="actions">
+          <a class="btn primary" href="#loyihalar" data-i18n="cta_projects">Loyihalarni ko'rish</a>
+          <a class="btn ghost" href="https://github.com/octavvos" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong>7</strong><span data-i18n="stat_projects">ochiq loyiha</span></div>
+          <div class="stat"><strong>148</strong><span data-i18n="stat_commits">commit ulardagi</span></div>
+          <div class="stat"><strong>2023</strong><span data-i18n="stat_since">birinchi repo</span></div>
+        </div>
+      </div>
+
+      <div style="min-width:0">
+        <div class="term" role="figure" aria-labelledby="term-cap">
+          <div class="term-bar">
+            <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+            <small>~/octavvos</small>
+          </div>
+<pre><span class="cmd">git log --all-repos --oneline -8</span>
+<span class="h">1544083</span> <span class="d">2026-11-03</span> <span class="r">ShoeFlow</span>      Frontend: login paytida dashboard kodini parallel yuklash
+<span class="h">0edf006</span> <span class="d">2026-11-03</span> <span class="r">ShoeFlow</span>      nginx: gzip, oldindan siqilgan fayllar va HTTP/2
+<span class="h">90f5e93</span> <span class="d">2026-11-02</span> <span class="r">Building-Git</span>  README: branch, switch, diff va merge
+<span class="h">91e008c</span> <span class="d">2026-11-02</span> <span class="r">BYD-salon</span>     README: o'rnatish va API hujjatlari
+<span class="h">6cfd9e0</span> <span class="d">2026-11-02</span> <span class="r">yuklaydi-bot</span>  install.sh: deno GitHub'dan yuklanadi
+<span class="h">e14009d</span> <span class="d">2026-10-22</span> <span class="r">TezYozish</span>     Add leaderboard, user profile with avatar
+<span class="h">a5a37f1</span> <span class="d">2026-09-22</span> <span class="r">edu-lms</span>       Manager: guruhlarni tahrirlash, mentor biriktirish
+<span class="h">5e1985a</span> <span class="d">2026-09-15</span> <span class="r">Alfa-fitness</span>  feat: admin uchun React (Vite) veb-paneli</pre>
+        </div>
+        <p class="term-caption" id="term-cap" data-i18n="term_caption">Har bir loyihaning oxirgi commitlari, GitHub'dan olingan.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="atlas" aria-hidden="true"></div>
+
+  <section id="loyihalar">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 data-i18n="featured_title">Asosiy loyihalar</h2>
+        <p class="sec-note" data-i18n="featured_note">Ikkalasi ham ochiq kodli</p>
+      </div>
+
+      <div class="featured">
+        <article class="feat">
+          <div class="feat-top">
+            <h3>ShoeFlow</h3>
+            <span class="pill live" data-i18n="pill_live">Production</span>
+          </div>
+          <p data-i18n="shoe_desc">Oyoq kiyim ishlab chiqaruvchi firma uchun CRM. Mijozlar, model–rang–razmer katalogi, ombor, buyurtmalar va moliya (to'lovlar, qarzdorlik) bitta tizimda.</p>
+          <ul>
+            <li data-i18n="shoe_b1">Firma kundalik ishida foydalanadi, API hujjatlari ochiq</li>
+            <li data-i18n="shoe_b2">Fon vazifalari Celery'da, deploy Docker va nginx bilan</li>
+            <li data-i18n="shoe_b3">Har bir push'da GitHub Actions CI, pre-commit tekshiruvlari</li>
+          </ul>
+          <div class="chips"><span class="chip">Django</span><span class="chip">DRF</span><span class="chip">PostgreSQL</span><span class="chip">Celery</span><span class="chip">Redis</span><span class="chip">Docker</span></div>
+          <div class="links">
+            <a href="https://github.com/octavvos/ShoeFlow" target="_blank" rel="noopener" data-i18n="link_code">Kod ↗</a>
+            <a href="https://shoeflow.bann.uz/api/docs/" target="_blank" rel="noopener" data-i18n="link_api">API docs ↗</a>
+            <span class="meta">36 commit</span>
+          </div>
+        </article>
+
+        <article class="feat">
+          <div class="feat-top">
+            <h3>Building-Git</h3>
+            <span class="pill" data-i18n="pill_tested">Git bilan tekshirilgan</span>
+          </div>
+          <p data-i18n="git_desc">Git'ning sof Python'dagi implementatsiyasi. Git bilan bir xil diskdagi formatni o'qiydi va yozadi, shuning uchun haqiqiy repolarda ishlaydi.</p>
+          <ul>
+            <li data-i18n="git_b1">Packfile'lar, binar index, .gitignore</li>
+            <li data-i18n="git_b2">branch, switch, diff va konflikt markerlari bilan three-way merge</li>
+            <li data-i18n="git_b3">Commit, tag va merge commitlar git chiqaradigan hashning aynan o'zini beradi; natijalar bayt-ma-bayt solishtiriladi</li>
+          </ul>
+          <div class="chips"><span class="chip">Python</span><span class="chip">pytest</span><span class="chip">GitHub Actions</span><span class="chip">zlib</span></div>
+          <div class="links">
+            <a href="https://github.com/octavvos/Building-Git" target="_blank" rel="noopener" data-i18n="link_code">Kod ↗</a>
+            <span class="meta">32 commit</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="sec-head" style="margin-top:64px">
+        <h2 data-i18n="other_title">Boshqa ishlar</h2>
+      </div>
+      <ul class="ledger">
+        <li class="row">
+          <a class="title" href="https://github.com/octavvos/edu-lms" target="_blank" rel="noopener">edu-lms</a>
+          <p data-i18n="edu_desc">B2B2C onlayn ta'lim marketplace'i: kurslar, mentorlar, guruhlar, dars jadvali, Payme orqali to'lov va HLS video.</p>
+          <span class="stack">Django REST · Next.js · PostgreSQL · Celery</span>
+        </li>
+        <li class="row">
+          <a class="title" href="https://github.com/octavvos/Alfa-fitness" target="_blank" rel="noopener">Alfa-fitness</a>
+          <p data-i18n="fit_desc">Fitness klub abonementlari: sotuv, QR kod bilan kirish, muzlatish. Mijozlar uchun Telegram bot, admin uchun React panel.</p>
+          <span class="stack">Django · DRF · Celery · aiogram · React</span>
+        </li>
+        <li class="row">
+          <a class="title" href="https://github.com/octavvos/TezYozish" target="_blank" rel="noopener">TezYozish</a>
+          <p data-i18n="tez_desc">Tez yozishni o'rgatuvchi sayt: mashqlar, harflar tushadigan o'yin-darslar, 2–6 kishilik real vaqtdagi poygalar. O'zbekcha, ruscha, inglizcha.</p>
+          <span class="stack">Django · JavaScript</span>
+        </li>
+        <li class="row">
+          <a class="title" href="https://github.com/octavvos/BYD-salon" target="_blank" rel="noopener">BYD-salon</a>
+          <p data-i18n="byd_desc">Avtosalon sayti: model katalogi, kredit kalkulyatori, test-drayv va murojaat arizalari, admin panel va REST API.</p>
+          <span class="stack">Django · DRF · JavaScript</span>
+        </li>
+        <li class="row">
+          <a class="title" href="https://github.com/octavvos/yuklaydi-bot" target="_blank" rel="noopener">yuklaydi-bot</a>
+          <p data-i18n="bot_desc">YouTube va Instagram'dan video yuklab beradigan Telegram bot: 360p–720p yoki MP3. Serverga bitta skript bilan o'rnatiladi.</p>
+          <span class="stack">aiogram 3 · yt-dlp · systemd</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="stek">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 data-i18n="stack_title">Nima bilan ishlayman</h2>
+      </div>
+      <dl class="stack-table">
+        <div class="stack-row"><dt>Backend</dt><dd>Python · Django · Django REST Framework · Celery · Django Channels · FastAPI</dd></div>
+        <div class="stack-row"><dt data-i18n="stack_data">Ma'lumotlar</dt><dd>PostgreSQL · Redis · SQLite</dd></div>
+        <div class="stack-row"><dt data-i18n="stack_infra">Infratuzilma</dt><dd>Docker · nginx · Linux, systemd · GitHub Actions</dd></div>
+        <div class="stack-row"><dt>Frontend</dt><dd>JavaScript · React · Next.js · HTML, CSS</dd></div>
+        <div class="stack-row"><dt data-i18n="stack_bots">Botlar</dt><dd>aiogram 3 · Telegram Bot API · yt-dlp</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section id="aloqa">
+    <div class="wrap contact">
+      <p class="big" data-i18n="contact_big">Loyiha yoki ish taklifi bo'lsa, yozing.</p>
+      <ul class="contact-list">
+        <li><span>Telegram</span><a href="https://t.me/AnswerTimestamp" target="_blank" rel="noopener">@AnswerTimestamp ↗</a></li>
+        <li><span>Email</span><a href="mailto:anvarjonshell@gmail.com">anvarjonshell@gmail.com</a></li>
+        <li><span>GitHub</span><a href="https://github.com/octavvos" target="_blank" rel="noopener">octavvos ↗</a></li>
+        <li><span data-i18n="contact_place">Joylashuv</span><b data-i18n="contact_city" style="font-weight:500">Farg'ona, UTC+5</b></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Light</span>
+    <span data-i18n="footer_note">Python va Django · Farg'ona</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var en = {
+    nav_projects: "Projects", nav_stack: "Stack", nav_contact: "Contact",
+    eyebrow: "Backend developer · Fergana, Uzbekistan",
+    lede: "I build the backends businesses run on every day: CRMs, learning platforms and Telegram bots.",
+    sub: "I work in Python and Django. I like understanding what happens inside a system, which is why I wrote Git from scratch.",
+    cta_projects: "See projects",
+    stat_projects: "public projects", stat_commits: "commits across them", stat_since: "first repo",
+    term_caption: "Latest commits from each project, pulled from GitHub.",
+    featured_title: "Featured projects", featured_note: "Both are open source",
+    pill_live: "Production", pill_tested: "Tested against git",
+    shoe_desc: "CRM for a footwear manufacturer: customers, a model/colour/size catalogue, inventory, orders and finance (payments and debts) in one system.",
+    shoe_b1: "Used by the company every day; the API docs are public",
+    shoe_b2: "Background jobs on Celery, deployed with Docker and nginx",
+    shoe_b3: "GitHub Actions CI on every push, pre-commit checks",
+    git_desc: "Git in pure Python. It reads and writes Git's own on-disk format, so it works on real repositories.",
+    git_b1: "Packfiles, the binary index, .gitignore",
+    git_b2: "branch, switch, diff and three-way merge with conflict markers",
+    git_b3: "Commits, tags and merge commits get the exact hashes git produces; output is compared byte for byte",
+    link_code: "Code ↗", link_api: "API docs ↗",
+    other_title: "More work",
+    edu_desc: "B2B2C learning marketplace: courses, mentors, groups, class schedules, Payme payments and HLS video.",
+    fit_desc: "Gym memberships: sales, QR check-in and freezing. A Telegram bot for members and a React panel for admins.",
+    tez_desc: "Typing trainer: practice texts, falling-letter lessons and live races for 2–6 players, in Uzbek, Russian and English.",
+    byd_desc: "Car dealership site: model catalogue, loan calculator, test-drive and enquiry forms, admin panel and REST API.",
+    bot_desc: "Telegram bot that downloads YouTube and Instagram videos in 360p–720p or as MP3. One script installs it on a server.",
+    stack_title: "What I work with", stack_data: "Data", stack_infra: "Infrastructure", stack_bots: "Bots",
+    contact_big: "Have a project or a role? Get in touch.",
+    contact_place: "Location", contact_city: "Fergana, UTC+5",
+    footer_note: "Python and Django · Fergana"
+  };
+  var nodes = document.querySelectorAll("[data-i18n]");
+  var uz = {};
+  nodes.forEach(function (n) { uz[n.dataset.i18n] = n.textContent; });
+  var dict = { uz: uz, en: en };
+
+  function setLang(lang) {
+    var d = dict[lang] || uz;
+    nodes.forEach(function (n) { var t = d[n.dataset.i18n]; if (t) n.textContent = t; });
+    document.documentElement.lang = lang;
+    document.querySelectorAll(".lang button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
+    });
+    try { localStorage.setItem("lang", lang); } catch (e) {}
+  }
+  document.querySelectorAll(".lang button").forEach(function (b) {
+    b.addEventListener("click", function () { setLang(b.dataset.lang); });
+  });
+  var saved = null;
+  try { saved = localStorage.getItem("lang"); } catch (e) {}
+  if (saved === "en") setLang("en");
+})();
+</script>
+
+</html>
