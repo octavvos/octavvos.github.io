@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Light · octavvos v2</title>
+<meta name="description" content="Light (octavvos) — Farg'onalik backend dasturchi: Python, Django, DRF, Telegram botlar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: split hero (intro | generated atlas panel), bento project grid on 6 columns, year timeline, services 2x2, contact band. */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --ink: #15171d;
+  --muted: #5b6070;
+  --line: #dfe2e8;
+  --accent: #a3154f;       /* atlas magenta */
+  --accent-soft: #f7e3ec;
+  --on-accent: #ffffff;
+  --gold: #c98a06;
+  --cobalt: #2347a0;
+  --teal: #0b6f78;
+  --band: #15171d;         /* contact band */
+  --on-band: #f2f3f6;
+  --band-muted: #a2a7b5;
+
+  --display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --body: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.1875rem;
+  --step-2: 1.5rem;
+  --step-3: clamp(1.9rem, 1.3rem + 2.2vw, 2.9rem);
+  --step-hero: clamp(3.4rem, 1.6rem + 7.5vw, 7.25rem);
+  --radius: 18px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101217;
+    --surface: #171a21;
+    --ink: #eceef3;
+    --muted: #9aa0ae;
+    --line: #272b35;
+    --accent: #f0609a;
+    --accent-soft: #3a1626;
+    --on-accent: #1a0710;
+    --gold: #f2b835;
+    --cobalt: #7096ef;
+    --teal: #57c4cb;
+    --band: #1b1f28;
+    --on-band: #eceef3;
+    --band-muted: #9aa0ae;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101217;
+  --surface: #171a21;
+  --ink: #eceef3;
+  --muted: #9aa0ae;
+  --line: #272b35;
+  --accent: #f0609a;
+  --accent-soft: #3a1626;
+  --on-accent: #1a0710;
+  --gold: #f2b835;
+  --cobalt: #7096ef;
+  --teal: #57c4cb;
+  --band: #1b1f28;
+  --on-band: #eceef3;
+  --band-muted: #9aa0ae;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: var(--step-0); line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+h1, h2, h3 { text-wrap: balance; }
+
+.wrap {
+  max-width: 1160px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (min-width: 720px) {
+  .wrap { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); }
+}
+
+/* Header */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9; padding-block: 12px;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  -webkit-backdrop-filter: saturate(1.3) blur(12px); backdrop-filter: saturate(1.3) blur(12px);
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--display); font-weight: 700; font-size: 1.125rem; letter-spacing: -0.01em; }
+.brand i { width: 26px; height: 26px; border-radius: 8px; background:
+  linear-gradient(90deg, var(--accent) 0 33%, var(--gold) 33% 50%, var(--cobalt) 50% 83%, var(--teal) 83%); }
+.nav { display: flex; align-items: center; gap: 18px; }
+.nav a { font-size: var(--step--1); text-decoration: none; color: var(--muted); }
+.nav a:hover { color: var(--ink); }
+@media (max-width: 720px) { .nav .nl { display: none; } }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface); }
+.seg a, .seg button {
+  font: 500 0.75rem/1 var(--mono); letter-spacing: 0.04em; text-decoration: none;
+  border: 0; background: transparent; color: var(--muted);
+  padding: 7px 10px; border-radius: 999px; cursor: pointer;
+}
+.seg [aria-current="page"], .seg [aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+/* Hero */
+.hero { padding-block: 48px 64px; }
+.hero .wrap { display: grid; gap: 36px; align-items: center; }
+@media (min-width: 940px) { .hero .wrap { grid-template-columns: 1.15fr 0.85fr; gap: 56px; } }
+.kicker { display: inline-flex; align-items: center; gap: 8px; font: 500 var(--step--1) var(--mono); color: var(--muted); margin: 0 0 18px; }
+.kicker b { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal) 20%, transparent); }
+.hero h1 {
+  font-family: var(--display); font-optical-sizing: auto; font-weight: 800;
+  font-size: var(--step-hero); line-height: 0.95; letter-spacing: -0.04em; margin: 0 0 22px;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+.lede { font-size: var(--step-1); line-height: 1.55; color: var(--muted); max-width: 44ch; margin: 0 0 28px; text-wrap: pretty; }
+.lede strong { color: var(--ink); font-weight: 500; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-weight: 500; font-size: 0.9375rem; text-decoration: none; cursor: pointer;
+  padding: 12px 20px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  transition: transform .15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } .btn:hover { transform: none; } }
+
+.atlas-panel { position: relative; border-radius: var(--radius); overflow: hidden; aspect-ratio: 4 / 5; max-width: 100%; background: var(--surface); border: 1px solid var(--line); }
+@media (max-width: 939px) { .atlas-panel { aspect-ratio: 16 / 10; } }
+.atlas-panel canvas { display: block; width: 100%; height: 100%; }
+.atlas-tag {
+  position: absolute; left: 14px; bottom: 14px; right: 14px;
+  display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  font: 500 0.75rem/1.4 var(--mono); color: var(--ink);
+}
+.atlas-tag span { background: color-mix(in srgb, var(--surface) 88%, transparent); padding: 6px 10px; border-radius: 999px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 36px; }
+.fact { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.fact strong { display: block; font-family: var(--display); font-weight: 700; font-size: var(--step-2); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.fact span { font-size: var(--step--1); color: var(--muted); }
+
+/* Sections */
+section { padding-block: 80px; }
+.sec-head { display: grid; gap: 10px; margin-bottom: 36px; max-width: 60ch; }
+.sec-label { font: 500 var(--step--1) var(--mono); color: var(--accent); letter-spacing: 0.04em; text-transform: uppercase; margin: 0; }
+h2 { font-family: var(--display); font-weight: 750; font-size: var(--step-3); line-height: 1.05; letter-spacing: -0.03em; margin: 0; }
+.sec-head p { margin: 0; color: var(--muted); }
+
+/* Bento */
+.bento { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bento .big, .bento .wide-t { grid-column: span 2; } }
+@media (min-width: 980px) {
+  .bento { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .bento .big { grid-column: span 3; }
+  .bento .mid { grid-column: span 2; }
+  .bento .half, .bento .wide-t { grid-column: span 3; }
+}
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 26px; display: flex; flex-direction: column; gap: 14px; min-width: 0;
+  transition: transform .2s ease, border-color .2s ease;
+}
+.card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }
+.card .type { font: 500 0.6875rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; }
+.card .type .live { color: var(--teal); display: inline-flex; gap: 6px; align-items: center; }
+.card .type .live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.card h3 { font-family: var(--display); font-weight: 750; letter-spacing: -0.02em; line-height: 1.1; margin: 0; font-size: var(--step-2); }
+.card.big h3 { font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem); }
+.card p { margin: 0; text-wrap: pretty; }
+.card ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 0.9375rem; color: var(--muted); }
+.card ul li { display: grid; grid-template-columns: 14px 1fr; gap: 8px; }
+.card ul li::before { content: ""; width: 6px; height: 6px; margin-top: 9px; border-radius: 2px; background: var(--accent); transform: rotate(45deg); }
+.card .stack { font: 400 0.75rem/1.6 var(--mono); color: var(--muted); }
+.card .foot { margin-top: auto; padding-top: 14px; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.card .foot .links { display: flex; gap: 16px; flex-wrap: wrap; }
+.card .foot a { color: var(--accent); text-decoration: none; font-weight: 500; font-size: 0.9375rem; }
+.card .foot a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.card .foot small { font: 400 0.75rem var(--mono); color: var(--muted); }
+
+/* Timeline */
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.timeline li { display: grid; grid-template-columns: 5.5rem 1fr; gap: 20px; position: relative; padding-bottom: 28px; }
+.timeline li::before { content: ""; position: absolute; left: calc(5.5rem + 9px); top: 10px; bottom: -2px; width: 2px; background: var(--line); }
+.timeline li:last-child::before { display: none; }
+.timeline time { font: 500 var(--step--1)/1.9 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.timeline .tl-body { position: relative; padding-left: 28px; min-width: 0; }
+.timeline .tl-body::before { content: ""; position: absolute; left: 3px; top: 7px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 3px solid var(--accent); }
+.timeline li.past .tl-body::before { border-color: var(--line); }
+.timeline h3 { font-family: var(--display); font-weight: 700; font-size: var(--step-1); margin: 0 0 4px; letter-spacing: -0.01em; }
+.timeline p { margin: 0; color: var(--muted); max-width: 60ch; }
+
+/* Services */
+.services { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 720px) { .services { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.svc { padding: 24px; border-radius: var(--radius); border: 1px solid var(--line); display: grid; gap: 10px; align-content: start; }
+.svc .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+.svc h3 { font-family: var(--display); font-weight: 700; font-size: var(--step-1); margin: 0; letter-spacing: -0.01em; }
+.svc p { margin: 0; color: var(--muted); }
+.svc .stack { font: 400 0.75rem/1.6 var(--mono); color: var(--muted); }
+
+/* Contact band */
+.band { background: var(--band); color: var(--on-band); border-radius: 28px; padding: clamp(28px, 5vw, 56px); display: grid; gap: 28px; }
+@media (min-width: 900px) { .band { grid-template-columns: 1.1fr 0.9fr; align-items: end; } }
+.band h2 { color: var(--on-band); font-size: clamp(2rem, 1.3rem + 3vw, 3.4rem); }
+.band p { color: var(--band-muted); margin: 12px 0 0; max-width: 44ch; }
+.clist { display: grid; gap: 10px; }
+.crow {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 14px 16px; border-radius: 14px; background: color-mix(in srgb, var(--on-band) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--on-band) 12%, transparent);
+}
+.crow span { font: 500 0.6875rem var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--band-muted); }
+.crow a, .crow code { color: var(--on-band); text-decoration: none; font: 500 0.9375rem var(--body); overflow-wrap: anywhere; }
+.crow a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.crow .val { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
+.copy {
+  font: 500 0.75rem/1 var(--mono); padding: 7px 10px; border-radius: 999px; cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--on-band) 25%, transparent); background: transparent; color: var(--on-band);
+}
+
+footer { padding-block: 32px 44px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: var(--step--1); color: var(--muted); }
+footer a { color: var(--muted); }
+
+/* Phone */
+@media (max-width: 560px) {
+  .hero { padding-block: 28px 48px; }
+  .actions { display: grid; grid-template-columns: 1fr; }
+  .facts { gap: 8px; }
+  .fact { padding: 12px; }
+  section { padding-block: 56px; }
+  .card { padding: 22px; }
+  .timeline li { grid-template-columns: 1fr; gap: 2px; padding-left: 28px; }
+  .timeline li::before { left: 9px; top: 26px; }
+  .timeline .tl-body { padding-left: 0; position: static; }
+  .timeline .tl-body::before { left: 3px; top: 6px; }
+  .band { border-radius: 20px; }
+}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><i aria-hidden="true"></i>Light</a>
+    <nav class="nav" aria-label="Sahifa">
+      <a class="nl" href="#loyihalar" data-i18n="nav_projects">Loyihalar</a>
+      <a class="nl" href="#yol" data-i18n="nav_path">Yo'lim</a>
+      <a class="nl" href="#aloqa" data-i18n="nav_contact">Aloqa</a>
+      <div class="seg" aria-label="Versiya">
+        <a href="https://octavvos.github.io/">v1</a>
+        <a href="https://octavvos.github.io/v2/" aria-current="page">v2</a>
+      </div>
+      <div class="seg" role="group" aria-label="Til / Language">
+        <button type="button" id="lang-uz" data-lang="uz" aria-pressed="true">UZ</button>
+        <button type="button" id="lang-en" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <p class="kicker"><b aria-hidden="true"></b><span data-i18n="kicker">Backend dasturchi · Farg'ona, O'zbekiston</span></p>
+        <h1 data-i18n="h1">Biznes ishlaydigan <em>backend</em> yozaman.</h1>
+        <p class="lede" data-i18n-html="lede">Salom, men <strong>Light</strong>. Python va Django'da CRM, ta'lim platformalari va Telegram botlar quraman. Tizim ichida nima bo'layotganini tushunishni yaxshi ko'raman, shuning uchun Git'ni noldan yozib chiqdim.</p>
+        <div class="actions">
+          <a class="btn primary" href="#loyihalar" data-i18n="cta_projects">Loyihalarni ko'rish</a>
+          <a class="btn" href="https://t.me/AnswerTimestamp" target="_blank" rel="noopener" data-i18n="cta_tg">Telegram'da yozish</a>
+        </div>
+        <div class="facts">
+          <div class="fact"><strong>7</strong><span data-i18n="f_projects">ochiq loyiha</span></div>
+          <div class="fact"><strong>148</strong><span data-i18n="f_commits">commit</span></div>
+          <div class="fact"><strong>2023</strong><span data-i18n="f_since">yildan beri</span></div>
+        </div>
+      </div>
+      <figure class="atlas-panel" style="margin:0">
+        <canvas id="atlas" aria-label="Marg'ilon atlasi naqshi" role="img"></canvas>
+        <figcaption class="atlas-tag"><span data-i18n="atlas_tag">Marg'ilon atlasi naqshi</span><span>40.38° N · 71.78° E</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <section id="loyihalar">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="sec-label" data-i18n="p_label">Loyihalar</p>
+        <h2 data-i18n="p_title">Haqiqiy foydalanuvchilar uchun qurilgan tizimlar</h2>
+        <p data-i18n="p_note">Hammasi ochiq kodli. Kodni GitHub'da ko'rish mumkin.</p>
+      </div>
+      <div class="bento">
+        <article class="card big">
+          <div class="type"><span>CRM</span><span class="live">Production</span></div>
+          <h3>ShoeFlow</h3>
+          <p data-i18n="shoe_desc">Oyoq kiyim ishlab chiqaruvchi firma uchun CRM. Mijozlar, model–rang–razmer katalogi, ombor, buyurtmalar va moliya bitta tizimda.</p>
+          <ul>
+            <li data-i18n="shoe_b1">Firma kundalik ishida foydalanadi, API hujjatlari ochiq</li>
+            <li data-i18n="shoe_b2">Fon vazifalari Celery'da, deploy Docker va nginx bilan</li>
+            <li data-i18n="shoe_b3">Har bir push'da GitHub Actions CI</li>
+          </ul>
+          <span class="stack">Django · DRF · PostgreSQL · Celery · Redis · Docker</span>
+          <div class="foot">
+            <div class="links"><a href="https://github.com/octavvos/ShoeFlow" target="_blank" rel="noopener" data-i18n="l_code">Kod ↗</a><a href="https://shoeflow.bann.uz/api/docs/" target="_blank" rel="noopener">API docs ↗</a></div>
+            <small>36 commit</small>
+          </div>
+        </article>
+        <article class="card big">
+          <div class="type"><span data-i18n="t_tool">Dev tool</span><span>MIT</span></div>
+          <h3>Building-Git</h3>
+          <p data-i18n="git_desc">Git'ning sof Python'dagi implementatsiyasi. Git bilan bir xil diskdagi formatni o'qiydi va yozadi, shuning uchun haqiqiy repolarda ishlaydi.</p>
+          <ul>
+            <li data-i18n="git_b1">Packfile'lar, binar index, .gitignore</li>
+            <li data-i18n="git_b2">branch, switch, diff va three-way merge</li>
+            <li data-i18n="git_b3">Commitlar git chiqaradigan hashning aynan o'zini beradi</li>
+          </ul>
+          <span class="stack">Python · pytest · GitHub Actions · zlib</span>
+          <div class="foot">
+            <div class="links"><a href="https://github.com/octavvos/Building-Git" target="_blank" rel="noopener" data-i18n="l_code">Kod ↗</a></div>
+            <small>32 commit</small>
+          </div>
+        </article>
+        <article class="card mid">
+          <div class="type"><span>LMS</span></div>
+          <h3>edu-lms</h3>
+          <p data-i18n="edu_desc">B2B2C onlayn ta'lim marketplace'i: kurslar, mentorlar, guruhlar, dars jadvali, Payme orqali to'lov va HLS video.</p>
+          <span class="stack">Django REST · Next.js · PostgreSQL · Celery</span>
+          <div class="foot"><div class="links"><a href="https://github.com/octavvos/edu-lms" target="_blank" rel="noopener" data-i18n="l_code">Kod ↗</a></div><small>47 commit</small></div>
+        </article>
+        <article class="card mid">
+          <div class="type"><span>Fitness</span></div>
+          <h3>Alfa-fitness</h3>
+          <p data-i18n="fit_desc">Fitness klub abonementlari: sotuv, QR kod bilan kirish, muzlatish. Mijozlar uchun Telegram bot, admin uchun React panel.</p>
+          <span class="stack">Django · DRF · Celery · aiogram · React</span>
+          <div class="foot"><div class="links"><a href="https://github.com/octavvos/Alfa-fitness" target="_blank" rel="noopener" data-i18n="l_code">Kod ↗</a></div><small>15 commit</small></div>
+        </article>
+        <article class="card mid">
+          <div class="type"><span data-i18n="t_edu">Ta'lim</span></div>
+          <h3>TezYozish</h3>
+          <p data-i18n="tez_desc">Tez yozishni o'rgatuvchi sayt: mashqlar, o'yin-darslar va 2–6 kishilik real vaqtdagi poygalar. O'zbekcha, ruscha, inglizcha.</p>
+          <span class="stack">Django · JavaScript</span>
+          <div class="foot"><div class="links"><a href="https://github.com/octavvos/TezYozish" target="_blank" rel="noopener" data-i18n="l_code">Kod ↗</a></div><small>2 commit</small></div>
+        </article>
+        <article class="card half">
+          <div class="type"><span data-i18n="t_site">Veb-sayt</span></div>
+          <h3>BYD-salon</h3>
+          <p data-i18n="byd_desc">Avtosalon sayti: model katalogi, kredit kalkulyatori, test-drayv va murojaat arizalari, admin panel va REST API.</p>
+          <span class="stack">Django · DRF · JavaScript</span>
+          <div class="foot"><div class="links"><a href="https://github.com/octavvos/BYD-salon" target="_blank" rel="noopener" data-i18n="l_code">Kod ↗</a></div><small>7 commit</small></div>
+        </article>
+        <article class="card wide-t">
+          <div class="type"><span>Telegram</span></div>
+          <h3>yuklaydi-bot</h3>
+          <p data-i18n="bot_desc">YouTube va Instagram'dan video yuklab beradigan Telegram bot: 360p–720p yoki MP3. Serverga bitta skript bilan o'rnatiladi.</p>
+          <span class="stack">aiogram 3 · yt-dlp · systemd</span>
+          <div class="foot"><div class="links"><a href="https://github.com/octavvos/yuklaydi-bot" target="_blank" rel="noopener" data-i18n="l_code">Kod ↗</a></div><small>9 commit</small></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="xizmat">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="sec-label" data-i18n="s_label">Nima qila olaman</p>
+        <h2 data-i18n="s_title">G'oyadan ishlab turgan serverga qadar</h2>
+      </div>
+      <div class="services">
+        <div class="svc">
+          <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 20V9"/></svg></div>
+          <h3 data-i18n="s1_t">Biznes tizimlari</h3>
+          <p data-i18n="s1_p">CRM, ombor, buyurtma va moliya hisobi. Rollar va ruxsatlar, hisobotlar, admin panel.</p>
+          <span class="stack">Django · PostgreSQL</span>
+        </div>
+        <div class="svc">
+          <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></svg></div>
+          <h3 data-i18n="s2_t">REST API va integratsiyalar</h3>
+          <p data-i18n="s2_p">Hujjatlashtirilgan API, JWT autentifikatsiya, Payme to'lovlari, SMS va fon vazifalari.</p>
+          <span class="stack">DRF · Celery · Redis</span>
+        </div>
+        <div class="svc">
+          <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4L3 11l6 2 2 6 3-4 5 4z"/></svg></div>
+          <h3 data-i18n="s3_t">Telegram botlar</h3>
+          <p data-i18n="s3_p">Ro'yxatdan o'tish, arizalar, to'lov va yuklab olish botlari. Admin uchun bildirishnomalar.</p>
+          <span class="stack">aiogram 3</span>
+        </div>
+        <div class="svc">
+          <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/></svg></div>
+          <h3 data-i18n="s4_t">Deploy va infratuzilma</h3>
+          <p data-i18n="s4_p">Docker, nginx, systemd xizmatlari, GitHub Actions'da CI. Serverga o'rnatish va qo'llab-quvvatlash.</p>
+          <span class="stack">Docker · nginx · Linux</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="yol">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="sec-label" data-i18n="y_label">Yo'lim</p>
+        <h2 data-i18n="y_title">Birinchi repodan production'gacha</h2>
+      </div>
+      <ol class="timeline">
+        <li><time>2026 · 11</time><div class="tl-body"><h3 data-i18n="y1_t">ShoeFlow, Building-Git, BYD-salon</h3><p data-i18n="y1_p">CRM ishga tushdi. Git'ning Python'dagi implementatsiyasi haqiqiy git bilan solishtiriladigan testlar bilan yakunlandi.</p></div></li>
+        <li><time>2026 · 10</time><div class="tl-body"><h3 data-i18n="y2_t">TezYozish va yuklaydi-bot</h3><p data-i18n="y2_p">Real vaqtdagi poygali tez yozish sayti va video yuklovchi Telegram bot.</p></div></li>
+        <li><time>2026 · 09</time><div class="tl-body"><h3 data-i18n="y3_t">Alfa-fitness</h3><p data-i18n="y3_p">REST API, Telegram bot va React admin panelli abonement tizimi.</p></div></li>
+        <li><time>2026 · 08</time><div class="tl-body"><h3 data-i18n="y4_t">edu-lms</h3><p data-i18n="y4_p">Django REST va Next.js'da katta ta'lim platformasi: to'lovlar, video, mentorlar.</p></div></li>
+        <li class="past"><time>2025</time><div class="tl-body"><h3 data-i18n="y5_t">FastAPI va CRM tajribalari</h3><p data-i18n="y5_p">API dizayn, testlar va CI/CD; Django'da birinchi CRM.</p></div></li>
+        <li class="past"><time>2023</time><div class="tl-body"><h3 data-i18n="y6_t">Birinchi repolar</h3><p data-i18n="y6_p">Django va DRF'ni o'rganish, birinchi Telegram bot.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="aloqa">
+    <div class="wrap">
+      <div class="band">
+        <div>
+          <h2 data-i18n="c_title">Birga ishlaymizmi?</h2>
+          <p data-i18n="c_p">Loyiha, ish taklifi yoki savol bo'lsa, yozing. Odatda Telegram'da tezroq javob beraman.</p>
+        </div>
+        <div class="clist">
+          <div class="crow"><span>Telegram</span><div class="val"><a href="https://t.me/AnswerTimestamp" target="_blank" rel="noopener">@AnswerTimestamp ↗</a></div></div>
+          <div class="crow"><span>Email</span><div class="val"><a id="email" href="mailto:anvarjonshell@gmail.com">anvarjonshell@gmail.com</a><button type="button" class="copy" id="copy-email" data-i18n="copy">Nusxa olish</button></div></div>
+          <div class="crow"><span>GitHub</span><div class="val"><a href="https://github.com/octavvos" target="_blank" rel="noopener">octavvos ↗</a></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Light · Farg'ona</span>
+    <span><a href="https://octavvos.github.io/" data-i18n="to_v1">1-versiyani ko'rish</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  /* i18n */
+  var en = {
+    nav_projects: "Projects", nav_path: "Path", nav_contact: "Contact",
+    kicker: "Backend developer · Fergana, Uzbekistan",
+    h1: "I build the <em>backend</em> a business runs on.",
+    lede: "Hi, I'm <strong>Light</strong>. I build CRMs, learning platforms and Telegram bots in Python and Django. I like understanding what happens inside a system, which is why I wrote Git from scratch.",
+    cta_projects: "See projects", cta_tg: "Message on Telegram",
+    f_projects: "public projects", f_commits: "commits", f_since: "coding since",
+    atlas_tag: "Margilan atlas pattern",
+    p_label: "Projects", p_title: "Systems built for real users", p_note: "All open source. The code is on GitHub.",
+    shoe_desc: "CRM for a footwear manufacturer: customers, a model/colour/size catalogue, inventory, orders and finance in one system.",
+    shoe_b1: "Used by the company every day; the API docs are public",
+    shoe_b2: "Background jobs on Celery, deployed with Docker and nginx",
+    shoe_b3: "GitHub Actions CI on every push",
+    t_tool: "Dev tool", t_edu: "Education", t_site: "Website",
+    git_desc: "Git in pure Python. It reads and writes Git's own on-disk format, so it works on real repositories.",
+    git_b1: "Packfiles, the binary index, .gitignore",
+    git_b2: "branch, switch, diff and three-way merge",
+    git_b3: "Commits get the exact hashes git produces",
+    l_code: "Code ↗",
+    edu_desc: "B2B2C learning marketplace: courses, mentors, groups, class schedules, Payme payments and HLS video.",
+    fit_desc: "Gym memberships: sales, QR check-in and freezing. A Telegram bot for members and a React panel for admins.",
+    tez_desc: "Typing trainer: practice texts, game lessons and live races for 2–6 players, in Uzbek, Russian and English.",
+    byd_desc: "Car dealership site: model catalogue, loan calculator, test-drive and enquiry forms, admin panel and REST API.",
+    bot_desc: "Telegram bot that downloads YouTube and Instagram videos in 360p–720p or as MP3. One script installs it on a server.",
+    s_label: "What I do", s_title: "From an idea to a running server",
+    s1_t: "Business systems", s1_p: "CRM, inventory, orders and finance. Roles and permissions, reports, an admin panel.",
+    s2_t: "REST APIs and integrations", s2_p: "Documented APIs, JWT auth, Payme payments, SMS and background jobs.",
+    s3_t: "Telegram bots", s3_p: "Sign-up, request, payment and download bots, with notifications for admins.",
+    s4_t: "Deployment and infrastructure", s4_p: "Docker, nginx, systemd services and CI on GitHub Actions. Server setup and upkeep.",
+    y_label: "Path", y_title: "From a first repo to production",
+    y1_t: "ShoeFlow, Building-Git, BYD-salon", y1_p: "The CRM went live. The Python Git implementation shipped with tests that compare it against real git.",
+    y2_t: "TezYozish and yuklaydi-bot", y2_p: "A typing site with live races and a video downloader bot for Telegram.",
+    y3_t: "Alfa-fitness", y3_p: "A membership system with a REST API, a Telegram bot and a React admin panel.",
+    y4_t: "edu-lms", y4_p: "A large learning platform on Django REST and Next.js: payments, video, mentors.",
+    y5_t: "FastAPI and CRM experiments", y5_p: "API design, testing and CI/CD; a first CRM in Django.",
+    y6_t: "First repositories", y6_p: "Learning Django and DRF, a first Telegram bot.",
+    c_title: "Let's work together", c_p: "Have a project, a role or a question? Get in touch. Telegram is usually the fastest way to reach me.",
+    copy: "Copy", copied: "Copied", to_v1: "See version 1"
+  };
+  var nodes = document.querySelectorAll("[data-i18n], [data-i18n-html]");
+  var uz = { copied: "Nusxa olindi" };
+  nodes.forEach(function (n) {
+    if (n.dataset.i18nHtml) uz[n.dataset.i18nHtml] = n.innerHTML;
+    else uz[n.dataset.i18n] = n.innerHTML;
+  });
+  var dict = { uz: uz, en: en }, current = "uz";
+  function setLang(lang) {
+    current = lang;
+    var d = dict[lang] || uz;
+    nodes.forEach(function (n) {
+      var k = n.dataset.i18nHtml || n.dataset.i18n;
+      if (d[k] != null) n.innerHTML = d[k];
+    });
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-lang]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.lang === lang)); });
+    try { localStorage.setItem("lang", lang); } catch (e) {}
+  }
+  document.querySelectorAll("[data-lang]").forEach(function (b) { b.addEventListener("click", function () { setLang(b.dataset.lang); }); });
+  var saved = null;
+  try { saved = localStorage.getItem("lang"); } catch (e) {}
+  if (saved === "en") setLang("en");
+
+  /* copy email */
+  var copyBtn = document.getElementById("copy-email");
+  copyBtn.addEventListener("click", function () {
+    var text = "anvarjonshell@gmail.com";
+    function done() { copyBtn.textContent = dict[current].copied; setTimeout(function () { copyBtn.textContent = dict[current].copy; }, 1600); }
+    function fallback() {
+      var r = document.createRange(); r.selectNodeContents(document.getElementById("email"));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    }
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+  });
+
+  /* atlas (ikat) pattern: vertical warp bands with feathered, stepped edges */
+  var cv = document.getElementById("atlas");
+  function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  function rng(seed) { return function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+  function draw() {
+    var box = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = Math.max(1, Math.round(box.width)), h = Math.max(1, Math.round(box.height));
+    cv.width = w * dpr; cv.height = h * dpr;
+    var c = cv.getContext("2d"); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var cols = [css("--accent"), css("--gold"), css("--cobalt"), css("--teal")];
+    c.fillStyle = css("--surface"); c.fillRect(0, 0, w, h);
+    var r = rng(7), motif = Math.max(90, Math.round(h / 4.2)), bandW = Math.max(36, Math.round(w / 7));
+    for (var bx = -bandW / 2, i = 0; bx < w + bandW; bx += bandW, i++) {
+      var col = cols[i % cols.length], col2 = cols[(i + 2) % cols.length];
+      for (var y = 0; y < h; y += 3) {
+        var phase = ((y + i * motif / 2) % motif) / motif;
+        var diamond = 1 - Math.abs(phase * 2 - 1);
+        var half = bandW * (0.18 + 0.32 * diamond);
+        var jitter = (r() - 0.5) * 7;
+        var cx = bx + bandW / 2;
+        c.fillStyle = col; c.globalAlpha = 0.92;
+        c.fillRect(cx - half + jitter, y, half * 2, 3);
+        if (diamond > 0.55) {
+          c.fillStyle = col2; c.globalAlpha = 0.95;
+          var inner = half * 0.42;
+          c.fillRect(cx - inner + jitter * 0.6, y, inner * 2, 3);
+        }
+      }
+    }
+    c.globalAlpha = 1;
+  }
+  draw();
+  var t; window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(draw, 120); });
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    if (mq.addEventListener) mq.addEventListener("change", draw);
+  }
+  new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+})();
+</script>
+
+</html>
