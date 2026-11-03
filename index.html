@@ -26,6 +26,7 @@
   --term-ink: #d7e4e5;
   --term-dim: #7f9599;
   --term-hash: #e0b04a;
+  --term-repo: #5cc6cd;
 
   --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
   --body: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -55,6 +56,7 @@
     --term-ink: #d7e4e5;
     --term-dim: #6f8589;
     --term-hash: #f0c060;
+    --term-repo: #6fd3d9;
     color-scheme: dark;
   }
 }
@@ -74,6 +76,7 @@
   --term-ink: #d7e4e5;
   --term-dim: #6f8589;
   --term-hash: #f0c060;
+  --term-repo: #6fd3d9;
   color-scheme: dark;
 }
 
@@ -103,8 +106,17 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 }
 
 /* Header */
-.top { padding-block: 20px; }
-.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9;
+  padding-block: 14px;
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px);
+          backdrop-filter: saturate(1.4) blur(12px);
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+}
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+@media (max-width: 560px) { .nav a { display: none; } }
 .handle { font-family: var(--mono); font-size: var(--step--1); text-decoration: none; color: var(--muted); }
 .handle b { color: var(--ink); font-weight: 500; }
 .nav { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
@@ -160,12 +172,21 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 .term-bar .dots { display: flex; gap: 6px; }
 .term-bar .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--term-dim); opacity: .5; }
 .term-bar small { font: 400 0.75rem var(--mono); color: var(--term-dim); }
-.term pre { margin: 0; padding: 16px; overflow-x: auto; font: 400 0.8125rem/1.75 var(--mono); }
-.term .cmd { color: var(--term-ink); }
+.term .cmd { margin: 0; padding: 16px 16px 6px; font: 400 0.8125rem/1.6 var(--mono); color: var(--term-ink); overflow-wrap: anywhere; }
 .term .cmd::before { content: "$ "; color: var(--term-dim); }
-.term .h { color: var(--term-hash); }
-.term .d { color: var(--term-dim); }
-.term .r { color: var(--accent); }
+.log { list-style: none; margin: 0; padding: 8px 16px 18px; display: grid; gap: 12px; font: 400 0.8125rem/1.5 var(--mono); }
+.log li {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 2px 12px;
+  padding-left: 12px; border-left: 2px solid rgba(255,255,255,0.1);
+  animation: log-in .45s ease both; animation-delay: calc(var(--i) * 70ms + 120ms);
+}
+.log li:first-child { border-left-color: var(--term-hash); }
+.log .h { color: var(--term-hash); }
+.log .r { color: var(--term-repo); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log .d { color: var(--term-dim); }
+.log .m { grid-column: 1 / -1; color: var(--term-ink); min-width: 0; overflow-wrap: anywhere; }
+@keyframes log-in { from { opacity: 0; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { .log li { animation: none; } }
 .term-caption { font-size: var(--step--1); color: var(--muted); margin: 10px 0 0; }
 
 /* Atlas band: the one decorative element */
@@ -256,6 +277,24 @@ dl { margin: 0; }
 .contact-list a { color: var(--accent); text-decoration: none; font-weight: 500; overflow-wrap: anywhere; }
 .contact-list a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
+.feat { transition: border-color .2s ease, transform .2s ease; }
+.feat:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) { .feat { transition: none; } .feat:hover { transform: none; } }
+
+/* Phone */
+@media (max-width: 560px) {
+  .hero { padding-block: 32px 44px; }
+  .hero .wrap { gap: 32px; }
+  .name { margin-bottom: 20px; }
+  .actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .btn { justify-content: center; padding-inline: 12px; }
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
+  section { padding-block: 56px; }
+  .sec-head { margin-bottom: 24px; }
+  .feat { padding: 22px; border-radius: 12px; }
+  .contact-list li { flex-direction: column; gap: 4px; }
+}
+
 footer { padding-block: 28px 40px; }
 footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: var(--step--1); color: var(--muted); }
 </style>
@@ -300,15 +339,17 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
             <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
             <small>~/octavvos</small>
           </div>
-<pre><span class="cmd">git log --all-repos --oneline -8</span>
-<span class="h">1544083</span> <span class="d">2026-11-03</span> <span class="r">ShoeFlow</span>      Frontend: login paytida dashboard kodini parallel yuklash
-<span class="h">0edf006</span> <span class="d">2026-11-03</span> <span class="r">ShoeFlow</span>      nginx: gzip, oldindan siqilgan fayllar va HTTP/2
-<span class="h">90f5e93</span> <span class="d">2026-11-02</span> <span class="r">Building-Git</span>  README: branch, switch, diff va merge
-<span class="h">91e008c</span> <span class="d">2026-11-02</span> <span class="r">BYD-salon</span>     README: o'rnatish va API hujjatlari
-<span class="h">6cfd9e0</span> <span class="d">2026-11-02</span> <span class="r">yuklaydi-bot</span>  install.sh: deno GitHub'dan yuklanadi
-<span class="h">e14009d</span> <span class="d">2026-10-22</span> <span class="r">TezYozish</span>     Add leaderboard, user profile with avatar
-<span class="h">a5a37f1</span> <span class="d">2026-09-22</span> <span class="r">edu-lms</span>       Manager: guruhlarni tahrirlash, mentor biriktirish
-<span class="h">5e1985a</span> <span class="d">2026-09-15</span> <span class="r">Alfa-fitness</span>  feat: admin uchun React (Vite) veb-paneli</pre>
+          <p class="cmd">git log --all-repos -8</p>
+          <ol class="log">
+            <li style="--i:0"><span class="h">1544083</span><span class="r">ShoeFlow</span><span class="d">2026-11-03</span><span class="m">Frontend: login paytida dashboard kodini parallel yuklash</span></li>
+            <li style="--i:1"><span class="h">0edf006</span><span class="r">ShoeFlow</span><span class="d">2026-11-03</span><span class="m">nginx: gzip, oldindan siqilgan fayllar va HTTP/2</span></li>
+            <li style="--i:2"><span class="h">90f5e93</span><span class="r">Building-Git</span><span class="d">2026-11-02</span><span class="m">README: branch, switch, diff va merge</span></li>
+            <li style="--i:3"><span class="h">91e008c</span><span class="r">BYD-salon</span><span class="d">2026-11-02</span><span class="m">README: o'rnatish va API hujjatlari</span></li>
+            <li style="--i:4"><span class="h">6cfd9e0</span><span class="r">yuklaydi-bot</span><span class="d">2026-11-02</span><span class="m">install.sh: deno GitHub'dan yuklanadi</span></li>
+            <li style="--i:5"><span class="h">e14009d</span><span class="r">TezYozish</span><span class="d">2026-10-22</span><span class="m">Add leaderboard, user profile with avatar</span></li>
+            <li style="--i:6"><span class="h">a5a37f1</span><span class="r">edu-lms</span><span class="d">2026-09-22</span><span class="m">Manager: guruhlarni tahrirlash, mentor biriktirish</span></li>
+            <li style="--i:7"><span class="h">5e1985a</span><span class="r">Alfa-fitness</span><span class="d">2026-09-15</span><span class="m">feat: admin uchun React (Vite) veb-paneli</span></li>
+          </ol>
         </div>
         <p class="term-caption" id="term-cap" data-i18n="term_caption">Har bir loyihaning oxirgi commitlari, GitHub'dan olingan.</p>
       </div>
