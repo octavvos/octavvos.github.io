@@ -116,7 +116,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
 }
 .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-@media (max-width: 560px) { .nav a { display: none; } }
+@media (max-width: 560px) { .nav > a, .handle .gh { display: none; } .nav { gap: 8px; } }
 .handle { font-family: var(--mono); font-size: var(--step--1); text-decoration: none; color: var(--muted); }
 .handle b { color: var(--ink); font-weight: 500; }
 .nav { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
@@ -129,6 +129,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   padding: 6px 10px; border-radius: 999px; cursor: pointer;
 }
 .lang button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.lang a { font: 500 0.75rem/1 var(--mono); letter-spacing: 0.06em; text-decoration: none; color: var(--muted); padding: 6px 10px; border-radius: 999px; }
+.lang a:hover { color: var(--ink); }
+.lang a[aria-current="page"] { background: var(--ink); color: var(--bg); }
 
 /* Hero */
 .hero { padding-block: 40px 56px; }
@@ -301,11 +304,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
 
 <header class="top">
   <div class="wrap">
-    <a class="handle" href="https://github.com/octavvos" target="_blank" rel="noopener">github.com/<b>octavvos</b></a>
+    <a class="handle" href="https://github.com/octavvos" target="_blank" rel="noopener"><span class="gh">github.com/</span><b>octavvos</b></a>
     <nav class="nav" aria-label="Sahifa">
       <a href="#loyihalar" data-i18n="nav_projects">Loyihalar</a>
       <a href="#stek" data-i18n="nav_stack">Stek</a>
       <a href="#aloqa" data-i18n="nav_contact">Aloqa</a>
+      <div class="lang" aria-label="Versiya">
+        <a href="https://octavvos.github.io/" aria-current="page">v1</a>
+        <a href="https://octavvos.github.io/v2/">v2</a>
+      </div>
       <div class="lang" role="group" aria-label="Til / Language">
         <button type="button" id="lang-uz" data-lang="uz" aria-pressed="true">UZ</button>
         <button type="button" id="lang-en" data-lang="en" aria-pressed="false">EN</button>
